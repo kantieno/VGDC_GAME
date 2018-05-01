@@ -32,7 +32,8 @@ public class Possess : MonoBehaviour {
 
 						//Set the active player representation
 						player.SetActive(false);
-						bow.SetActive (true);
+						//bow.SetActive (true);
+						bow.GetComponent<BowBehave>().possessed = possessedObject.gameObject;
 
 					}
 				}
@@ -45,7 +46,8 @@ public class Possess : MonoBehaviour {
 				player.GetComponent<GridMove> ().setTarget (possessedObject.gameObject.GetComponent<GridMove>().getGridPosition());
 				player.GetComponent<GridMove> ().setGridPosition (possessedObject.gameObject.GetComponent<GridMove>().getGridPosition());
 				player.transform.position = possessedObject.gameObject.GetComponent<GridMove>().getGridPosition();
-				bow.SetActive (false);
+				//bow.SetActive (false);
+				bow.GetComponent<BowBehave>().possessed = null;
 
 				//Depossess the object and clear its value
 				possessedObject.GetComponent<Possessable> ().depossess ();

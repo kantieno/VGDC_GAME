@@ -6,8 +6,17 @@ public class EnemyAi : MonoBehaviour {
 
 	private UnityEngine.AI.NavMeshAgent navAgent;
 	private Vector3 move;
+	private float waitTime = 0.0f;
+	private SeePlayer viewer;
+	private Vector3 dest;
 	public string[] movements; 
 	public int step = 0;
+	public float speed = 100.0f;
+	public float panickedSpeed = 150.0f;
+	public bool panicked = false;
+	public GameObject exit;
+
+
 
 	// Use this for initialization
 	void Start () {
@@ -15,24 +24,67 @@ public class EnemyAi : MonoBehaviour {
 		navAgent= transform.GetComponent<UnityEngine.AI.NavMeshAgent> ();
 		//Position will be set using grid move
 		navAgent.updatePosition = false;
+
+		string[] currentMove = movements [step].Split (',');
+		if (currentMove [0] == "w") {
+			waitTime = Time.fixedTime + float.Parse (currentMove [1]);
+			step++;
+			if (step >= movements.Length)
+				step = 0;
+		} 
+		//Do not put two waits in a row
+		currentMove = movements [step].Split (',');
+		dest = new Vector3 (float.Parse (currentMove [0]), 0.0f, float.Parse (currentMove [1]));
+		step++;
+
+		viewer = gameObject.GetComponent<SeePlayer> ();
+
 	}
 	
 	// Update is called once per frame
 	void Update () {
-
+		if (viewer.CanSeePlayer ()) {
+			panicked = true;
+			dest = exit.transform.position;
+			gameObject.GetComponent<GridMove> ().speed = panickedSpeed;
+			//navAgent.speed = panickedSpeed;
+		}
 		if (!gameObject.GetComponent<Possessable> ().isPossessed ()) {
-			
-			//Setting destination for testing
-			navAgent.destination = new Vector3 (20.0f, 0.05f, 0.0f);
 
-			//Setting next grid move required to reach destination
-			determineMove ();
+			if (waitTime <= Time.fixedTime || panicked) {
 
-			//Attempt to call a new move, it will return 0 when the previous move is complete
-			if (gameObject.GetComponent<GridMove> ().Move (move.x, move.z) != 1)
+				if (!panicked){
+					if (dest.x == GetComponent<GridMove> ().getPosition ().x && dest.z == GetComponent<GridMove> ().getPosition ().z) {
+						string[] currentMove = movements [step].Split (',');
+						if (currentMove [0] == "w") {
+							waitTime = Time.fixedTime + float.Parse (currentMove [1]);
+							step++;
+							if (step >= movements.Length)
+								step = 0;
+						} 
+						currentMove = movements [step].Split (',');
+						dest = new Vector3 (float.Parse (currentMove [0]), 0.0f, float.Parse (currentMove [1]));
+						step++;
+						if (step >= movements.Length)
+							step = 0;
+					}
+				}
+
+
+				//Setting destination for testing
+				navAgent.destination = dest;
+
+				//Setting next grid move required to reach destination
+				determineMove ();
+
+				//Attempt to call a new move, it will return 0 when the previous move is complete
+				if (gameObject.GetComponent<GridMove> ().Move (move.x, move.z) != 1)
 			//When the move completes, set the simulated position back to the real position
 			navAgent.nextPosition = transform.position;
-		}
+			}
+
+			}
+
 	}
 
 	void FixedUpdate(){

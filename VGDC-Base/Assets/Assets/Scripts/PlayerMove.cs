@@ -12,5 +12,7 @@ public class PlayerMove : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		gameObject.GetComponent<GridMove> ().Move (Input.GetAxis ("Horizontal"), Input.GetAxis ("Vertical"));
+
+
 	}
 }

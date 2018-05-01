@@ -18,7 +18,7 @@ public class Activate : MonoBehaviour {
 				//Check if the collided object has the possessable component
 				Activatable act = hit.collider.gameObject.GetComponent<Activatable> ();
 				if (act != null) {
-
+					
 					//Possess the object
 					act.activate ();
 
