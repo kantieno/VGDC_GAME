@@ -13,6 +13,7 @@ public class PlayerMove : MonoBehaviour {
 	void Update () {
 		gameObject.GetComponent<GridMove> ().Move (Input.GetAxis ("Horizontal"), Input.GetAxis ("Vertical"));
 
-
+		if (Input.GetKeyDown ("r"))
+			UnityEngine.SceneManagement.SceneManager.LoadScene ("Test");
 	}
 }
